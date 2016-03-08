@@ -1,22 +1,67 @@
+```{r setup, echo=FALSE, warning=FALSE, purl=FALSE, message=FALSE}
+options(repos="http://cran.rstudio.com/")
+pkgs <- c("dplyr","knitr")
+x<-lapply(pkgs, library, character.only = TRUE)
+opts_chunk$set(tidy=T)
+```
+
 # More fun with `dplyr`
-These materials will go over some introductory materials (i.e. from our [Intro R Workshop](https://github.com/rhodyrstats/intro_r_workshop)) as well as expand into some of the other functionality.  This presentation is heavily influenced by the [Introduction to `dplyr`](https://cran.r-project.org/web/packages/dplyr/vignettes/introduction.html) and [Databases](https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html) vigenettes. In particular we will cover:
+These materials will go over some introductory materials (i.e. from our [Intro R Workshop](https://github.com/rhodyrstats/intro_r_workshop)) as well as expand into some of the other functionality.  This presentation is heavily influenced by the [Introduction to `dplyr`](https://cran.r-project.org/web/packages/dplyr/vignettes/introduction.html), the [Two-table Verbs](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html), and [Databases](https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html) vigenettes. In particular we will cover:
 
 - [A word about pipes](#a-word-about-pipes)
 - [Manipulating data](#manipulating-data)
-- [Manipulting grouped data](#manipulting-grouped-data)
+- [Manipulating grouped data](#manipulating-grouped-data)
 - [Database functionality: joins](#database-functionality-joins)
 - [Database functionality: external databases](#database-functionality-external-databases)
 
 ## A word about pipes
+There are many different ways to go about scripting an analyis in R (or any language for that matter).  These were discussed in the [Intro to R Workshop](https://github.com/rhodyrstats/intro_r_workshop/blob/master/lessons/03_wrangling.md#using-dplyr)(scroll down a bit), but to review, they are: using intermediate steps/objects, nest functions, or use pipes.  If you are developing new functions or packages it is probably best to not use pipes as it adds a dependency and de-bugging can be a bit of a challenge.  If you are scripting data analysis, pipes (i.e. `%>%` from `magrittr`) are, in my opinion, the way to go.  For this presentation we will use pipes for all the examples.
 
 ## Manipulating data
+The `dplyr` package is first and foremost a package to help faciliatate data manipulation.  What it does can certainly be done with base R or with other packages, but it can be argued that `dplyr` makes these tasks more undertandable through its use of a consistent interface.  In particular, this is accomplished through the use of data manipulation verbs.  These verbs are:
 
-`select()` `arrange()` `filter()` `slice()` `rename()` `distinct()` `sample_n()` `sample_frac()` `mutate()` `transmutate()` `summarise()` 
+- `select()`: selects columns from a data frame 
+- `arrange()`: Arranges a data frame in ascending or descending order based on column(s). 
+- `filter()`: Select observations from a data frame based on values in column(s).
+- `slice()`: Selects observations based on specific rows 
+- `rename()`: Rename columns in a dataframe
+- `distinct()`: Get unique rows (OK, not a verb...) 
+- `sample_n()`: Randomly select 'n' number of rows
+- `sample_frac()`: Randomly select a fraction of rows 
+- `mutate()`: Adds new columns to a data frame and keeps all other columns
+- `transmutate()`: Adds new columns to a data frame and drops all other columns
+- `summarise()`: Summarizes your data.
 
-## Manipulting grouped data
 
-`group_by()` `summarise()` `n()` `n_distinct()` `first()` `last()` `nth()`
+## Manipulating grouped data
+
+- `group_by()` 
+- `summarise()` 
+- `n()` 
+- `n_distinct()` 
+- `first()` 
+- `last()` 
+- `nth()`
 
 ## Database functionality: joins
 
+- `left_join()` 
+- `right_join()` 
+- `inner_join()` 
+- `full_join()`
+
+Will let you explore the others on your own.
+- `semi_join()` 
+- `anti_join()` 
+- `intersect()` 
+- `union()` 
+- `setdiff()`
+
 ## Database functionality: external databases
+
+- `src_sqlite()` 
+- `tbl()` 
+- `collect()` 
+- `translate_sql()`
+- `copy_to()`
+
