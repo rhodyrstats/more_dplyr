@@ -482,7 +482,7 @@ If `dplyr` stopped there it would still be a useful package.  It, of course, doe
 - `group_by()`: Function to create groups from column(s) in your data. 
 - `summarise()`: Saw this above, but really shines when summarizing across groups. 
 - `n()`: A function for use within the `summarize()` function 
-- `n_distinct()`: Similar to `n()` it is used as part of `summarize()` to return number of distinct values 
+
 
 To start working with grouped data you need to do
 
@@ -537,13 +537,7 @@ sites_sel %>% group_by(WSA_ECO9) %>% summarize(avg = mean(DEPTHMAX, na.rm = T),
 ## 9      XER  9.769892 10.374465    93
 ```
 
-- `group_by()` 
-- `summarise()` 
-- `n()` 
-- `n_distinct()` 
-- `first()` 
-- `last()` 
-- `nth()`
+Pretty cool!  
 
 ## Database functionality: joins
 We will need to add another dataset to try some joins.  
