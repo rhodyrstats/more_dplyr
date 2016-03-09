@@ -493,9 +493,10 @@ sites_sel %>% group_by(WSA_ECO9)
 
 ```
 ## Source: local data frame [1,252 x 7]
-## Groups: WSA_ECO9
+## Groups: WSA_ECO9 [9]
 ## 
 ##          SITE_ID         LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
+##           (fctr)           (fctr)    (int)    (fctr)   (fctr)     (dbl)
 ## 1  NLA06608-0001    Lake Wurdeman        1 PROB_Lake      WMT 66.293055
 ## 2  NLA06608-0002       Crane Pond        1 PROB_Lake      CPL 14.437998
 ## 3  NLA06608-0002       Crane Pond        2 PROB_Lake      CPL 14.437998
@@ -523,16 +524,17 @@ sites_sel %>% group_by(WSA_ECO9) %>% summarize(avg = mean(DEPTHMAX, na.rm = T),
 ```
 ## Source: local data frame [9 x 4]
 ## 
-##   WSA_ECO9       avg   std_dev   n
-## 1      CPL  4.275969  3.644019 130
-## 2      NAP 12.148092 13.702994 131
-## 3      NPL  5.376000  8.597514  75
-## 4      SAP 10.809028  9.784024 144
-## 5      SPL  6.381290  5.459042 155
-## 6      TPL  6.211834  5.684888 169
-## 7      UMW 10.204046  7.130465 173
-## 8      WMT 17.076374 14.789396 182
-## 9      XER  9.769892 10.374465  93
+##   WSA_ECO9       avg   std_dev     n
+##     (fctr)     (dbl)     (dbl) (int)
+## 1      CPL  4.275969  3.644019   130
+## 2      NAP 12.148092 13.702994   131
+## 3      NPL  5.376000  8.597514    75
+## 4      SAP 10.809028  9.784024   144
+## 5      SPL  6.381290  5.459042   155
+## 6      TPL  6.211834  5.684888   169
+## 7      UMW 10.204046  7.130465   173
+## 8      WMT 17.076374 14.789396   182
+## 9      XER  9.769892 10.374465    93
 ```
 
 Pretty cool!  
@@ -776,10 +778,42 @@ head(sites_wq_all)
 ```
 
 ## Database functionality: external databases
+The last `dplyr` functionality we will talk about is connecting to an existing database.  There are several databases that are supported: SQLite, PostgreSQL, MySQL, MariaDB, and Bigquery. We will just focus on SQLite as it is by far the easiest to setup and use.  
 
-- `src_sqlite()` 
-- `tbl()` 
-- `collect()` 
-- `translate_sql()`
-- `copy_to()`
+The main functions we will look at are:
+
+- `src_sqlite()`: Creates a connection to a SQLite database (or creates a new one) 
+- `tbl()`: Using a connection, allow connections to specific tables
+- `collect()`: Forces computation on database and pulls results into a data frame (by default `dplyr` only pulls data from database into R when you ask)
+- `translate_sql():` Handy little tool to see how R expressions can be written as SQL.
+- `copy_to()`: Writes a data frame to a external database
+
+Let's see how this works.
+
+First we need to create the connection to the database.  
+
+
+```r
+# We need to load up the RSQLite package
+library(RSQLite)
+# Then connect
+nla_sqlite <- src_sqlite("nla2007.sqlite3")
+nla_sqlite
+```
+
+```
+## src:  sqlite 3.8.6 [nla2007.sqlite3]
+## tbls: rec, sites, sqlite_stat1, wq
+```
+
+Now we can access the tables 
+
+
+
+And see how to pull the table into a data frame
+
+
+
+Let's do some summaries of the data and then write back a new table to our data frame.
+
 

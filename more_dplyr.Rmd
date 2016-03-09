@@ -251,10 +251,39 @@ head(sites_wq_all)
 ```
 
 ## Database functionality: external databases
+The last `dplyr` functionality we will talk about is connecting to an existing database.  There are several databases that are supported: SQLite, PostgreSQL, MySQL, MariaDB, and Bigquery. We will just focus on SQLite as it is by far the easiest to setup and use.  
 
-- `src_sqlite()` 
-- `tbl()` 
-- `collect()` 
-- `translate_sql()`
-- `copy_to()`
+The main functions we will look at are:
 
+- `src_sqlite()`: Creates a connection to a SQLite database (or creates a new one) 
+- `tbl()`: Using a connection, allow connections to specific tables
+- `collect()`: Forces computation on database and pulls results into a data frame (by default `dplyr` only pulls data from database into R when you ask)
+- `translate_sql():` Handy little tool to see how R expressions can be written as SQL.
+- `copy_to()`: Writes a data frame to a external database
+
+Let's see how this works.
+
+First we need to create the connection to the database.  
+
+```{r}
+#We need to load up the RSQLite package
+library(RSQLite)
+#Then connect
+nla_sqlite <- src_sqlite("nla2007.sqlite3")
+nla_sqlite
+```
+
+Now we can access the tables 
+
+```{r}
+```
+
+And see how to pull the table into a data frame
+
+```{r}
+```
+
+Let's do some summaries of the data and then write back a new table to our data frame.
+
+```{r}
+```
