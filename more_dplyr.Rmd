@@ -1,6 +1,6 @@
 ```{r setup, echo=FALSE, warning=FALSE, purl=FALSE, message=FALSE}
 options(repos="http://cran.rstudio.com/")
-pkgs <- c("dplyr","knitr")
+pkgs <- c("dplyr","knitr","RSQLite")
 x<-lapply(pkgs, library, character.only = TRUE)
 opts_chunk$set(tidy=T)
 ```
@@ -148,6 +148,31 @@ sites_sel %>%
 ```
 
 ## Manipulating grouped data
+If `dplyr` stopped there it would still be a useful package.  It, of course, does not stop there.  One of the more powerful things you can do with `dplyr` is to run grouped operations.  This is especially useful in the context of summarizing your data.  The functions we will be looking at are:
+
+- `group_by()`: Function to create groups from column(s) in your data. 
+- `summarise()`: Saw this above, but really shines when summarizing across groups. 
+- `n()`: A function for use within the `summarize()` function 
+- `n_distinct()`: Similar to `n()` it is used as part of `summarize()` to return number of distinct values 
+
+To start working with grouped data you need to do
+
+```{r}
+sites_sel %>%
+  group_by(WSA_ECO9)
+```
+
+So, that looks a little different that we were expecting.  What `group_by()` did was to create a special `dplyr` object.  We can see that in how this printed to the screen.  It also includes what groups we are using in this summary.  
+
+Now to work with those groups using `summarise()`
+
+```{r}
+sites_sel %>%
+  group_by(WSA_ECO9) %>%
+  summarize(avg = mean(DEPTHMAX,na.rm = T),
+            std_dev = sd(DEPTHMAX, na.rm = T),
+            n = n())
+```
 
 - `group_by()` 
 - `summarise()` 

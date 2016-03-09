@@ -477,6 +477,65 @@ sites_sel %>% summarize(avg_depth = mean(DEPTHMAX, na.rm = T), n = n()) %>%
 ```
 
 ## Manipulating grouped data
+If `dplyr` stopped there it would still be a useful package.  It, of course, does not stop there.  One of the more powerful things you can do with `dplyr` is to run grouped operations.  This is especially useful in the context of summarizing your data.  The functions we will be looking at are:
+
+- `group_by()`: Function to create groups from column(s) in your data. 
+- `summarise()`: Saw this above, but really shines when summarizing across groups. 
+- `n()`: A function for use within the `summarize()` function 
+- `n_distinct()`: Similar to `n()` it is used as part of `summarize()` to return number of distinct values 
+
+To start working with grouped data you need to do
+
+
+```r
+sites_sel %>% group_by(WSA_ECO9)
+```
+
+```
+## Source: local data frame [1,252 x 7]
+## Groups: WSA_ECO9 [9]
+## 
+##          SITE_ID         LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
+##           (fctr)           (fctr)    (int)    (fctr)   (fctr)     (dbl)
+## 1  NLA06608-0001    Lake Wurdeman        1 PROB_Lake      WMT 66.293055
+## 2  NLA06608-0002       Crane Pond        1 PROB_Lake      CPL 14.437998
+## 3  NLA06608-0002       Crane Pond        2 PROB_Lake      CPL 14.437998
+## 4  NLA06608-0003  Wilderness Lake        1 PROB_Lake      CPL  5.701737
+## 5  NLA06608-0003  Wilderness Lake        2 PROB_Lake      CPL  5.701737
+## 6  NLA06608-0004  Puett Reservoir        1 PROB_Lake      WMT 65.386309
+## 7  NLA06608-0004  Puett Reservoir        2 PROB_Lake      WMT 65.386309
+## 8  NLA06608-0005     Perkins Lake        1 PROB_Lake      WMT 19.487613
+## 9  NLA06608-0005     Perkins Lake        2 PROB_Lake      WMT 19.487613
+## 10 NLA06608-0006 Morris Reservoir        1 PROB_Lake      NAP 56.199748
+## ..           ...              ...      ...       ...      ...       ...
+## Variables not shown: DEPTHMAX (dbl)
+```
+
+So, that looks a little different that we were expecting.  What `group_by()` did was to create a special `dplyr` object.  We can see that in how this printed to the screen.  It also includes what groups we are using in this summary.  
+
+Now to work with those groups using `summarise()`
+
+
+```r
+sites_sel %>% group_by(WSA_ECO9) %>% summarize(avg = mean(DEPTHMAX, na.rm = T), 
+    std_dev = sd(DEPTHMAX, na.rm = T), n = n())
+```
+
+```
+## Source: local data frame [9 x 4]
+## 
+##   WSA_ECO9       avg   std_dev     n
+##     (fctr)     (dbl)     (dbl) (int)
+## 1      CPL  4.275969  3.644019   130
+## 2      NAP 12.148092 13.702994   131
+## 3      NPL  5.376000  8.597514    75
+## 4      SAP 10.809028  9.784024   144
+## 5      SPL  6.381290  5.459042   155
+## 6      TPL  6.211834  5.684888   169
+## 7      UMW 10.204046  7.130465   173
+## 8      WMT 17.076374 14.789396   182
+## 9      XER  9.769892 10.374465    93
+```
 
 - `group_by()` 
 - `summarise()` 
