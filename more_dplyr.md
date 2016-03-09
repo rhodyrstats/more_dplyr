@@ -493,10 +493,9 @@ sites_sel %>% group_by(WSA_ECO9)
 
 ```
 ## Source: local data frame [1,252 x 7]
-## Groups: WSA_ECO9 [9]
+## Groups: WSA_ECO9
 ## 
 ##          SITE_ID         LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
-##           (fctr)           (fctr)    (int)    (fctr)   (fctr)     (dbl)
 ## 1  NLA06608-0001    Lake Wurdeman        1 PROB_Lake      WMT 66.293055
 ## 2  NLA06608-0002       Crane Pond        1 PROB_Lake      CPL 14.437998
 ## 3  NLA06608-0002       Crane Pond        2 PROB_Lake      CPL 14.437998
@@ -524,23 +523,37 @@ sites_sel %>% group_by(WSA_ECO9) %>% summarize(avg = mean(DEPTHMAX, na.rm = T),
 ```
 ## Source: local data frame [9 x 4]
 ## 
-##   WSA_ECO9       avg   std_dev     n
-##     (fctr)     (dbl)     (dbl) (int)
-## 1      CPL  4.275969  3.644019   130
-## 2      NAP 12.148092 13.702994   131
-## 3      NPL  5.376000  8.597514    75
-## 4      SAP 10.809028  9.784024   144
-## 5      SPL  6.381290  5.459042   155
-## 6      TPL  6.211834  5.684888   169
-## 7      UMW 10.204046  7.130465   173
-## 8      WMT 17.076374 14.789396   182
-## 9      XER  9.769892 10.374465    93
+##   WSA_ECO9       avg   std_dev   n
+## 1      CPL  4.275969  3.644019 130
+## 2      NAP 12.148092 13.702994 131
+## 3      NPL  5.376000  8.597514  75
+## 4      SAP 10.809028  9.784024 144
+## 5      SPL  6.381290  5.459042 155
+## 6      TPL  6.211834  5.684888 169
+## 7      UMW 10.204046  7.130465 173
+## 8      WMT 17.076374 14.789396 182
+## 9      XER  9.769892 10.374465  93
 ```
 
 Pretty cool!  
 
 ## Database functionality: joins
-We will need to add another dataset to try some joins.  
+So far we have only worked with a single table.  That isn't always what you want to do and `dplyr` provides functions for doing most types of database joins as well as selections based on set operations.  We will be showing ony the basic join types here:  
+
+- `left_join()`: Joins two data frames together based on a common ID. Keeps all observations from the first data frame (i.e. the one on the left) 
+- `right_join()`: Same as `left_join()` except it keeps observations from the second data frame 
+- `inner_join()`: Keeps only observations that are in both data frames. 
+- `full_join()`: Keeps all observations.
+
+Will let you explore the others on your own.
+
+- `semi_join()` 
+- `anti_join()` 
+- `intersect()` 
+- `union()` 
+- `setdiff()`
+
+We will need to add another dataset and filter our sites some to show how the different joins work.  
 
 
 ```r
@@ -559,17 +572,208 @@ head(wq_sel)
 ## 6 NLA06608-0004        1  4.60 344  18 3.810
 ```
 
-- `left_join()` 
-- `right_join()` 
-- `inner_join()` 
-- `full_join()`
+```r
+sites_sel <- sites_sel %>% filter(SITE_TYPE == "PROB_Lake")
+```
 
-Will let you explore the others on your own.
-- `semi_join()` 
-- `anti_join()` 
-- `intersect()` 
-- `union()` 
-- `setdiff()`
+We can take a look at the dimension of each of these.
+
+
+```r
+dim(sites_sel)
+```
+
+```
+## [1] 1128    7
+```
+
+```r
+dim(wq_sel)
+```
+
+```
+## [1] 1252    6
+```
+
+Now lets join the water quality data to the site data and keep only those observations that are in the site data (i.e. only the PROB_Lakes).
+
+
+```r
+sites_wq <- left_join(sites_sel, wq_sel)
+```
+
+```
+## Joining by: c("SITE_ID", "VISIT_NO")
+```
+
+```r
+dim(sites_wq)
+```
+
+```
+## [1] 1128   11
+```
+
+```r
+head(sites_wq)
+```
+
+```
+##         SITE_ID        LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
+## 1 NLA06608-0001   Lake Wurdeman        1 PROB_Lake      WMT 66.293055
+## 2 NLA06608-0002      Crane Pond        1 PROB_Lake      CPL 14.437998
+## 3 NLA06608-0002      Crane Pond        2 PROB_Lake      CPL 14.437998
+## 4 NLA06608-0003 Wilderness Lake        1 PROB_Lake      CPL  5.701737
+## 5 NLA06608-0003 Wilderness Lake        2 PROB_Lake      CPL  5.701737
+## 6 NLA06608-0004 Puett Reservoir        1 PROB_Lake      WMT 65.386309
+##   DEPTHMAX  CHLA NTL PTL  TURB
+## 1      8.3  0.24 151   6 0.474
+## 2      2.3  3.84 695  36 3.550
+## 3      1.3 20.88 469  22 3.870
+## 4      2.5 16.96 738  43 7.670
+## 5      2.4 12.86 843  50 9.530
+## 6      6.3  4.60 344  18 3.810
+```
+
+Or if we go the other way
+
+
+```r
+wq_sites <- right_join(sites_sel, wq_sel)
+```
+
+```
+## Joining by: c("SITE_ID", "VISIT_NO")
+```
+
+```r
+dim(wq_sites)
+```
+
+```
+## [1] 1252   11
+```
+
+```r
+head(wq_sites)
+```
+
+```
+##         SITE_ID        LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
+## 1 NLA06608-0001   Lake Wurdeman        1 PROB_Lake      WMT 66.293055
+## 2 NLA06608-0002      Crane Pond        1 PROB_Lake      CPL 14.437998
+## 3 NLA06608-0002      Crane Pond        2 PROB_Lake      CPL 14.437998
+## 4 NLA06608-0003 Wilderness Lake        1 PROB_Lake      CPL  5.701737
+## 5 NLA06608-0003 Wilderness Lake        2 PROB_Lake      CPL  5.701737
+## 6 NLA06608-0004 Puett Reservoir        1 PROB_Lake      WMT 65.386309
+##   DEPTHMAX  CHLA NTL PTL  TURB
+## 1      8.3  0.24 151   6 0.474
+## 2      2.3  3.84 695  36 3.550
+## 3      1.3 20.88 469  22 3.870
+## 4      2.5 16.96 738  43 7.670
+## 5      2.4 12.86 843  50 9.530
+## 6      6.3  4.60 344  18 3.810
+```
+
+To get just those observations that are common to both
+
+
+```r
+# First manufacture some differences
+wq_samp <- wq_sel %>% sample_frac(0.75)
+sites_samp <- sites_sel %>% sample_frac(0.75)
+dim(wq_samp)
+```
+
+```
+## [1] 939   6
+```
+
+```r
+dim(sites_samp)
+```
+
+```
+## [1] 846   7
+```
+
+```r
+# Then the inner_join
+sites_wq_in <- inner_join(sites_samp, wq_samp)
+```
+
+```
+## Joining by: c("SITE_ID", "VISIT_NO")
+```
+
+```r
+dim(sites_wq_in)
+```
+
+```
+## [1] 623  11
+```
+
+```r
+head(sites_wq_in)
+```
+
+```
+##         SITE_ID      LAKENAME VISIT_NO SITE_TYPE WSA_ECO9    AREA_HA
+## 1 NLA06608-4643    Birch Lake        1 PROB_Lake      SPL  449.46901
+## 2 NLA06608-0738   Island Pond        1 PROB_Lake      NAP   76.92370
+## 3 NLA06608-0900   Forbes Lake        1 PROB_Lake      TPL  233.88423
+## 4 NLA06608-1148   Mother Lake        1 PROB_Lake      SPL  201.95267
+## 5 NLA06608-0031 Caldwell Lake        2 PROB_Lake      SAP   24.24954
+## 6 NLA06608-0938 Muskegon Lake        1 PROB_Lake      UMW 1899.63347
+##   DEPTHMAX  CHLA  NTL PTL    TURB
+## 1      8.8 13.83  557  19   4.670
+## 2     14.0  1.70  223   3   0.539
+## 3      8.2 15.65  700  48   3.910
+## 4      1.4 48.00 6934 242 172.000
+## 5      4.8  8.50  394  24   6.240
+## 6     19.0 11.89  519  34   5.410
+```
+
+Lastly, lets join and keep it all
+
+
+```r
+sites_wq_all <- full_join(sites_sel, wq_sel)
+```
+
+```
+## Joining by: c("SITE_ID", "VISIT_NO")
+```
+
+```r
+dim(sites_wq_all)
+```
+
+```
+## [1] 1252   11
+```
+
+```r
+head(sites_wq_all)
+```
+
+```
+##         SITE_ID        LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
+## 1 NLA06608-0001   Lake Wurdeman        1 PROB_Lake      WMT 66.293055
+## 2 NLA06608-0002      Crane Pond        1 PROB_Lake      CPL 14.437998
+## 3 NLA06608-0002      Crane Pond        2 PROB_Lake      CPL 14.437998
+## 4 NLA06608-0003 Wilderness Lake        1 PROB_Lake      CPL  5.701737
+## 5 NLA06608-0003 Wilderness Lake        2 PROB_Lake      CPL  5.701737
+## 6 NLA06608-0004 Puett Reservoir        1 PROB_Lake      WMT 65.386309
+##   DEPTHMAX  CHLA NTL PTL  TURB
+## 1      8.3  0.24 151   6 0.474
+## 2      2.3  3.84 695  36 3.550
+## 3      1.3 20.88 469  22 3.870
+## 4      2.5 16.96 738  43 7.670
+## 5      2.4 12.86 843  50 9.530
+## 6      6.3  4.60 344  18 3.810
+```
 
 ## Database functionality: external databases
 

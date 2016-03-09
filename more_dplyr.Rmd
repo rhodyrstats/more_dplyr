@@ -177,26 +177,78 @@ sites_sel %>%
 Pretty cool!  
 
 ## Database functionality: joins
-We will need to add another dataset to try some joins.  
+So far we have only worked with a single table.  That isn't always what you want to do and `dplyr` provides functions for doing most types of database joins as well as selections based on set operations.  We will be showing ony the basic join types here:  
+
+- `left_join()`: Joins two data frames together based on a common ID. Keeps all observations from the first data frame (i.e. the one on the left) 
+- `right_join()`: Same as `left_join()` except it keeps observations from the second data frame 
+- `inner_join()`: Keeps only observations that are in both data frames. 
+- `full_join()`: Keeps all observations.
+
+Will let you explore the others on your own.
+
+- `semi_join()` 
+- `anti_join()` 
+- `intersect()` 
+- `union()` 
+- `setdiff()`
+
+We will need to add another dataset and filter our sites some to show how the different joins work.  
 
 ```{r}
 wq <- read.csv("http://www.epa.gov/sites/production/files/2014-10/nla2007_chemical_conditionestimates_20091123.csv")
 wq_sel<-wq %>%
   select(SITE_ID,VISIT_NO,CHLA,NTL,PTL,TURB)
 head(wq_sel)
+sites_sel <- sites_sel %>% 
+  filter(SITE_TYPE == "PROB_Lake")
 ```
 
-- `left_join()` 
-- `right_join()` 
-- `inner_join()` 
-- `full_join()`
+We can take a look at the dimension of each of these.
 
-Will let you explore the others on your own.
-- `semi_join()` 
-- `anti_join()` 
-- `intersect()` 
-- `union()` 
-- `setdiff()`
+```{r}
+dim(sites_sel)
+dim(wq_sel)
+```
+
+Now lets join the water quality data to the site data and keep only those observations that are in the site data (i.e. only the PROB_Lakes).
+
+```{r}
+sites_wq <- left_join(sites_sel,wq_sel)
+dim(sites_wq)
+head(sites_wq)
+```
+
+Or if we go the other way
+
+```{r}
+wq_sites <- right_join(sites_sel,wq_sel)
+dim(wq_sites)
+head(wq_sites)
+```
+
+To get just those observations that are common to both
+
+```{r}
+#First manufacture some differences
+wq_samp <- wq_sel %>%
+  sample_frac(.75)
+sites_samp <- sites_sel %>%
+  sample_frac(.75)
+dim(wq_samp)
+dim(sites_samp)
+#Then the inner_join
+sites_wq_in <- inner_join(sites_samp,wq_samp)
+dim(sites_wq_in)
+head(sites_wq_in)
+```
+
+Lastly, lets join and keep it all
+
+```{r}
+sites_wq_all <- full_join(sites_sel, wq_sel)
+dim(sites_wq_all)
+head(sites_wq_all)
+```
 
 ## Database functionality: external databases
 
