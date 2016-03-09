@@ -32,6 +32,120 @@ The `dplyr` package is first and foremost a package to help faciliatate data man
 - `transmutate()`: Adds new columns to a data frame and drops all other columns
 - `summarise()`: Summarizes your data.
 
+Before we move on, we need some data.  Once again, I am going to rely on the 2007 National Lakes Assessment Data:
+
+```{r}
+sites <- read.csv("http://www.epa.gov/sites/production/files/2014-01/nla2007_sampledlakeinformation_20091113.csv")
+```
+
+Let's look at the columns for each of these
+
+```{r}
+names(sites)
+```
+
+Given the large number of fields in these, I may want to reduce just to what I am interested in.
+
+```{r}
+sites_sel<-sites %>%
+  select(SITE_ID,LAKENAME,VISIT_NO,SITE_TYPE,WSA_ECO9,AREA_HA,DEPTHMAX)
+head(sites_sel)
+```
+
+We can arrange the data.
+
+```{r}
+#Ascending is default
+sites_sel %>%
+  arrange(DEPTHMAX) %>%
+  head()
+#Descending need desc()
+sites_sel %>%
+  arrange(desc(DEPTHMAX)) %>%
+  head()
+#By more than one column
+sites_sel %>%
+  arrange(WSA_ECO9,desc(DEPTHMAX))%>%
+  head()
+```
+
+Let's filter out just some of the deeper lakes
+
+```{r}
+sites_sel %>%
+  filter(DEPTHMAX >= 50)
+```
+
+Or just the deep lakes in Northern Applachians Ecoregion
+
+```{r}
+sites_sel %>%
+  filter(WSA_ECO9 == "NAP", DEPTHMAX >= 50)
+```
+
+We can also grab observations by row
+
+```{r}
+sites_sel %>%
+  slice(c(1,2))
+#or
+sites_sel %>%
+  slice(seq(1,nrow(sites_sel),100))
+```
+
+Renaming columns is easy
+
+```{r}
+sites_sel %>%
+  rename(Ecoregion = WSA_ECO9, MaxDepth = DEPTHMAX)%>%
+  head()
+```
+
+We can identify distinct values and get those rows
+
+```{r}
+sites_sel %>%
+  distinct(WSA_ECO9)
+#Returns the first row with the distinct value so order has an impact
+sites_sel %>%
+  arrange(desc(DEPTHMAX))%>%
+  distinct(WSA_ECO9)
+```
+
+Sampling by number or fraction and with or without replacment is done like:
+
+```{r}
+set.seed(72)
+#By Number
+sites_sel %>%
+  sample_n(10)
+
+#By Fraction
+sites_sel %>%
+  sample_frac(0.01)
+```
+
+To create new columns
+
+```{r}
+#Add it to the other columns
+sites_sel %>%
+  mutate(volume = ((10000*AREA_HA) * DEPTHMAX)/3)%>%
+  head()
+#Create only the new column
+sites_sel %>%
+  transmute(mean_depth = (((10000*AREA_HA) * DEPTHMAX)/3)/(AREA_HA*10000)) %>%
+  head()
+```
+
+Lastly, we can get summaries of our data
+
+```{r}
+sites_sel %>%
+  summarize(avg_depth = mean(DEPTHMAX,na.rm=T),
+            n = n()) %>%
+  head()
+```
 
 ## Manipulating grouped data
 
@@ -44,6 +158,14 @@ The `dplyr` package is first and foremost a package to help faciliatate data man
 - `nth()`
 
 ## Database functionality: joins
+We will need to add another dataset to try some joins.  
+
+```{r}
+wq <- read.csv("http://www.epa.gov/sites/production/files/2014-10/nla2007_chemical_conditionestimates_20091123.csv")
+wq_sel<-wq %>%
+  select(SITE_ID,VISIT_NO,CHLA,NTL,PTL,TURB)
+head(wq_sel)
+```
 
 - `left_join()` 
 - `right_join()` 
