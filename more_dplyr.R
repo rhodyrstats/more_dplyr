@@ -134,10 +134,45 @@ library(RSQLite)
 #Then connect
 nla_sqlite <- src_sqlite("nla2007.sqlite3")
 nla_sqlite
+#List Tables
+src_tbls(nla_sqlite)
 
 ## ------------------------------------------------------------------------
+#Get it all
+sites_sqlite <- tbl(nla_sqlite,"sites")
+wq_sqlite <- tbl(nla_sqlite,"wq")
+
+#Use some SQL
+sites_qry <- tbl(nla_sqlite,sql("SELECT * FROM sites WHERE VISIT_NO == 1"))
+sites_qry
 
 ## ------------------------------------------------------------------------
+sites_sel_sqlite <- sites_sqlite %>% 
+  select(SITE_ID,LAKENAME,VISIT_NO,SITE_TYPE,WSA_ECO9,AREA_HA,DEPTHMAX)
 
 ## ------------------------------------------------------------------------
+object.size(sites_sel)
+object.size(sites_sel_sqlite)
+
+## ------------------------------------------------------------------------
+sites_sel_collect <- sites_sel_sqlite %>%
+  arrange(desc(AREA_HA))%>%
+  collect()
+
+## ------------------------------------------------------------------------
+#A Bootstrapped sample
+ecor_depth_stats <- sites_sel_collect %>% 
+  group_by(WSA_ECO9) %>%
+  sample_n(1000,replace=T) %>%
+  summarize(avg = mean(DEPTHMAX, na.rm=TRUE),
+          sd = sd(DEPTHMAX, na.rm=TRUE),
+          boot_n = n())
+
+#And write back to the database
+src_tbls(nla_sqlite)
+copy_to(nla_sqlite,ecor_depth_stats)
+src_tbls(nla_sqlite)
+
+## ----echo=FALSE,messages=FALSE,warning=FALSE-----------------------------
+db_drop_table(nla_sqlite$con,table="ecor_depth_stats")
 
