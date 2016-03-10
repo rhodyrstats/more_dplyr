@@ -493,10 +493,9 @@ sites_sel %>% group_by(WSA_ECO9)
 
 ```
 ## Source: local data frame [1,252 x 7]
-## Groups: WSA_ECO9 [9]
+## Groups: WSA_ECO9
 ## 
 ##          SITE_ID         LAKENAME VISIT_NO SITE_TYPE WSA_ECO9   AREA_HA
-##           (fctr)           (fctr)    (int)    (fctr)   (fctr)     (dbl)
 ## 1  NLA06608-0001    Lake Wurdeman        1 PROB_Lake      WMT 66.293055
 ## 2  NLA06608-0002       Crane Pond        1 PROB_Lake      CPL 14.437998
 ## 3  NLA06608-0002       Crane Pond        2 PROB_Lake      CPL 14.437998
@@ -524,17 +523,16 @@ sites_sel %>% group_by(WSA_ECO9) %>% summarize(avg = mean(DEPTHMAX, na.rm = T),
 ```
 ## Source: local data frame [9 x 4]
 ## 
-##   WSA_ECO9       avg   std_dev     n
-##     (fctr)     (dbl)     (dbl) (int)
-## 1      CPL  4.275969  3.644019   130
-## 2      NAP 12.148092 13.702994   131
-## 3      NPL  5.376000  8.597514    75
-## 4      SAP 10.809028  9.784024   144
-## 5      SPL  6.381290  5.459042   155
-## 6      TPL  6.211834  5.684888   169
-## 7      UMW 10.204046  7.130465   173
-## 8      WMT 17.076374 14.789396   182
-## 9      XER  9.769892 10.374465    93
+##   WSA_ECO9       avg   std_dev   n
+## 1      CPL  4.275969  3.644019 130
+## 2      NAP 12.148092 13.702994 131
+## 3      NPL  5.376000  8.597514  75
+## 4      SAP 10.809028  9.784024 144
+## 5      SPL  6.381290  5.459042 155
+## 6      TPL  6.211834  5.684888 169
+## 7      UMW 10.204046  7.130465 173
+## 8      WMT 17.076374 14.789396 182
+## 9      XER  9.769892 10.374465  93
 ```
 
 Pretty cool!  
@@ -806,14 +804,157 @@ nla_sqlite
 ## tbls: rec, sites, sqlite_stat1, wq
 ```
 
+```r
+# List Tables
+src_tbls(nla_sqlite)
+```
+
+```
+## [1] "rec"          "sites"        "sqlite_stat1" "wq"
+```
+
 Now we can access the tables 
 
 
+```r
+# Get it all
+sites_sqlite <- tbl(nla_sqlite, "sites")
+wq_sqlite <- tbl(nla_sqlite, "wq")
+
+# Use some SQL
+sites_qry <- tbl(nla_sqlite, sql("SELECT * FROM sites WHERE VISIT_NO == 1"))
+sites_qry
+```
+
+```
+## Source: sqlite 3.8.6 [nla2007.sqlite3]
+## From: <derived table> [?? x 99]
+## 
+##          SITE_ID VISIT_NO SAMPLED  DATE_COL REPEAT SITE_TYPE
+## 1  NLA06608-0001        1     YES 7/31/2007        PROB_Lake
+## 2  NLA06608-0002        1     YES 6/14/2007    YES PROB_Lake
+## 3  NLA06608-0003        1     YES 8/29/2007    YES PROB_Lake
+## 4  NLA06608-0004        1     YES 7/10/2007    YES PROB_Lake
+## 5  NLA06608-0005        1     YES 7/18/2007    YES PROB_Lake
+## 6  NLA06608-0006        1     YES 7/17/2007    YES PROB_Lake
+## 7  NLA06608-0007        1     YES 7/24/2007    YES PROB_Lake
+## 8  NLA06608-0008        1     YES 7/12/2007    YES PROB_Lake
+## 9  NLA06608-0010        1     YES 7/17/2007    YES PROB_Lake
+## 10 NLA06608-0012        1     YES 6/13/2007    YES PROB_Lake
+## ..           ...      ...     ...       ...    ...       ...
+## Variables not shown: LAKE_SAMP (chr), TNT (chr), LON_DD (dbl), LAT_DD
+##   (dbl), ALBERS_X (dbl), ALBERS_Y (dbl), FLD_LON_DD (dbl), FLD_LAT_DD
+##   (dbl), FLD_SRC (chr), FLD_FLAG (chr), ST (chr), STATE_NAME (chr),
+##   CNTYNAME (chr), EPA_REG (chr), NHDNAME (chr), LAKENAME (chr), AREA_CAT7
+##   (chr), NESLAKE (chr), NESLAKE_ID (chr), STRATUM (chr), PANEL (chr),
+##   DSGN_CAT (chr), MDCATY (dbl), WGT (dbl), WGT_NLA (dbl), ADJWGT_CAT
+##   (chr), URBAN (chr), WSA_ECO3 (chr), WSA_ECO9 (chr), ECO_LEV_3 (int),
+##   ECO_L3_NAM (chr), NUT_REG (chr), NUTREG_NAME (chr), ECO_NUTA (chr),
+##   LAKE_ORIGIN (chr), ECO3_X_ORIGIN (chr), REF_CLUSTER (chr), REFCLUS_NAME
+##   (chr), RT_NLA (chr), REF_NUTR (chr), AREA_HA (dbl), SIZE_CLASS (chr),
+##   LAKEAREA (dbl), LAKEPERIM (dbl), SLD (dbl), DEPTH_X (dbl), DEPTHMAX
+##   (dbl), ELEV_PT (dbl), HUC_2 (int), HUC_8 (int), REACHCODE (dbl), COM_ID
+##   (int), INDEX_SAMP (chr), STATUS_VER (chr), STATUS_FLD (chr), STATUS_DSK
+##   (chr), PERM_WATER (chr), NON_SALINE (chr), SRFC_AREA (chr), METER_DEEP
+##   (chr), OPEN_WATER (chr), AQUACULTUR (chr), DISPOSAL (chr), SEWAGE (chr),
+##   EVAPORATE (chr), PHYS_ACCES (chr), FLAG_INFO (chr), COMMENT_INFO (chr),
+##   SAMPLED_PROFILE (chr), SAMPLED_SECCHI (chr), SAMPLED_ASSESS (chr),
+##   SAMPLED_PHAB (chr), INDXSAMP_PHAB (chr), SAMPLED_CHEM (chr),
+##   INDXSAMP_CHEM (chr), SAMPLED_CHLA (chr), INDXSAMP_CHLA (chr),
+##   SAMPLED_ZOOP (chr), INDXSAMP_ZOOP (chr), SAMPLED_PHYT (chr),
+##   INDXSAMP_PHYT (chr), SAMPLED_CORE (chr), INDXSAMP_CORE (chr),
+##   SAMPLED_INF (chr), INDXSAMP_INF (chr), SAMPLED_ENTE (chr), INDXSAMP_ENTE
+##   (chr), SAMPLED_MICR (chr), INDXSAMP_MICR (chr), SAMPLED_SDHG (chr),
+##   INDXSAMP_SDHG (chr), VISIT_ID (int), FID_1 (int)
+```
+
+And run our other `dplyr` functions on the connection.
+
+
+```r
+sites_sel_sqlite <- sites_sqlite %>% select(SITE_ID, LAKENAME, VISIT_NO, SITE_TYPE, 
+    WSA_ECO9, AREA_HA, DEPTHMAX)
+```
+
+But notice the size compared to the original data frame.
+
+
+```r
+object.size(sites_sel)
+```
+
+```
+## 144400 bytes
+```
+
+```r
+object.size(sites_sel_sqlite)
+```
+
+```
+## 3444 bytes
+```
+
+Because of this, it allows us to work with databases that are larger than available memory as most of the data is stored on disk. Thus we can work out a fairly complicated analysis workflow and then pull back only those data we need into R (and thus into memory).
 
 And see how to pull the table into a data frame
 
 
+```r
+sites_sel_collect <- sites_sel_sqlite %>% arrange(desc(AREA_HA)) %>% collect()
+```
 
 Let's do some summaries of the data and then write back a new table to our data frame.
+
+
+```r
+# A Bootstrapped sample
+ecor_depth_stats <- sites_sel_collect %>% group_by(WSA_ECO9) %>% sample_n(1000, 
+    replace = T) %>% summarize(avg = mean(DEPTHMAX, na.rm = TRUE), sd = sd(DEPTHMAX, 
+    na.rm = TRUE), boot_n = n())
+
+# And write back to the database
+src_tbls(nla_sqlite)
+```
+
+```
+## [1] "rec"          "sites"        "sqlite_stat1" "wq"
+```
+
+```r
+copy_to(nla_sqlite, ecor_depth_stats)
+```
+
+```
+## Source: sqlite 3.8.6 [nla2007.sqlite3]
+## From: ecor_depth_stats [9 x 4]
+## 
+##   WSA_ECO9       avg        sd boot_n
+## 1      CPL  4.303434  3.878500   1000
+## 2      NAP 12.326100 13.474435   1000
+## 3      NPL  5.771500  8.804427   1000
+## 4      SAP 10.656800  9.584026   1000
+## 5      SPL  6.549000  5.567753   1000
+## 6      TPL  6.265600  5.776967   1000
+## 7      UMW 10.491700  7.282010   1000
+## 8      WMT 17.132300 14.656121   1000
+## 9      XER 10.377100 10.955825   1000
+```
+
+```r
+src_tbls(nla_sqlite)
+```
+
+```
+## [1] "ecor_depth_stats" "rec"              "sites"           
+## [4] "sqlite_stat1"     "sqlite_stat1"     "wq"
+```
+
+
+
+## Hands-on
+The hands-on for this will be ad-hoc.
+
+Make sure you can run the examples.  Once you have done that, try some different functions with different columns or summary stats.  A good place to start is with the joins.  Try your own joins and then your own grouping column (or columns!) and get a feel for using `summarize()`.
 
 
